@@ -1,6 +1,9 @@
 package shop.mtcoding.blog.handler;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import shop.mtcoding.blog.handler.ex.CustomException;
@@ -11,7 +14,9 @@ public class CustomExceptionHanlder {
 
     // NullPointException <- RuntimeException
     @ExceptionHandler(CustomException.class)
-    public String customException(CustomException e) {
-        return Script.back(e.getMessage());
+    public ResponseEntity<?> customException(CustomException e) {
+
+        return new ResponseEntity<>(Script.back(e.getMessage()), e.getStatus());
+
     }
 }
