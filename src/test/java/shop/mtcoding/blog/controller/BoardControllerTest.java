@@ -101,7 +101,7 @@ public class BoardControllerTest {
         for (int i = 0; i < 90; i++) {
             title += "가";
         }
-        String requestBody = "title=" + title + "&content=내용1";
+        String requestBody = "title=제목&content=내용&userId=1";
 
         // when
         ResultActions resultActions = mvc.perform(
@@ -129,5 +129,27 @@ public class BoardControllerTest {
         // then
         resultActions.andExpect(status().isOk());
         // assertThat(dto.getUsername()).isEqualTo("love");
+    }
+
+    @Test
+    public void update_test() throws Exception {
+        // given
+        setUp();
+        String title = "";
+        for (int i = 0; i < 90; i++) {
+            title += "가";
+        }
+        String requestBody = "title=제목&content=내용&userId=1";
+        int id = 1;
+
+        // when
+        ResultActions resultActions = mvc.perform(
+                post("/board/" + id + "/update")
+                        .content(requestBody)
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                        .session(mockSession));
+
+        // then
+        resultActions.andExpect(status().is3xxRedirection());
     }
 }

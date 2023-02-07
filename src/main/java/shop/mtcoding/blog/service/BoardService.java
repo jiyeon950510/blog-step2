@@ -6,13 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import shop.mtcoding.blog.dto.board.BoardReq.BoardSaveReqDto;
+import shop.mtcoding.blog.dto.board.BoardReq.BoardupdateReqDto;
 import shop.mtcoding.blog.dto.board.BoardResp.BoardMainResDto;
 import shop.mtcoding.blog.handler.ex.CustomApiException;
 import shop.mtcoding.blog.handler.ex.CustomException;
 import shop.mtcoding.blog.model.Board;
 import shop.mtcoding.blog.model.BoardRepository;
+import shop.mtcoding.blog.model.User;
 
 @Transactional(readOnly = true)
 @Service
@@ -47,6 +50,24 @@ public class BoardService {
             // 로그를 남겨 놔야함(DB or File)
         }
         boardRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void 글수정(BoardupdateReqDto boardupdateReqDto, User principal) {
+        Board boardUb = boardRepository.findById(principal.getId());
+        if (boardUb == null) {
+            throw new CustomException("없는 게시글을 수정할 수 없습니다");
+        }
+        if (boardUb.getUserId() != boardupdateReqDto.getUserId()) {
+            throw new CustomException("해당 게시글을 수정할 권한이 없습니다", HttpStatus.FORBIDDEN);
+        }
+
+        int result = boardRepository.updateById(boardupdateReqDto.getId(), boardupdateReqDto.getTitle(),
+                boardupdateReqDto.getContent());
+        if (result != 1) {
+            throw new CustomException("글수정 실패", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        // return 1;
     }
 
 }

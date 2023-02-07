@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import shop.mtcoding.blog.dto.ResponseDto;
 import shop.mtcoding.blog.dto.board.BoardReq.BoardSaveReqDto;
+import shop.mtcoding.blog.dto.board.BoardReq.BoardupdateReqDto;
 import shop.mtcoding.blog.dto.board.BoardResp.BoardMainResDto;
 import shop.mtcoding.blog.handler.ex.CustomApiException;
 import shop.mtcoding.blog.handler.ex.CustomException;
@@ -34,6 +35,22 @@ public class BoardController {
     private BoardService boardService;
     @Autowired
     private BoardRepository boardRepository;
+
+    @PostMapping("/board/{id}/update")
+    public String update(@PathVariable int id, BoardupdateReqDto boardUpdateDto) {
+        User principal = (User) session.getAttribute("principal");
+        if (principal == null) {
+            throw new CustomException("인증이 되지 않았습니다", HttpStatus.UNAUTHORIZED);
+        }
+        if (boardUpdateDto.getTitle() == null || boardUpdateDto.getTitle().isEmpty()) {
+            throw new CustomException("title을 작성해주세요");
+        }
+        if (boardUpdateDto.getContent() == null || boardUpdateDto.getContent().isEmpty()) {
+            throw new CustomException("content를 작성해주세요");
+        }
+        boardService.글수정(boardUpdateDto, principal);
+        return "redirect:/board/{id}";
+    }
 
     @DeleteMapping("/board/{id}") // @ResponseBody 데이터를 응답
     public @ResponseBody ResponseEntity<?> delete(@PathVariable int id) {
@@ -79,7 +96,8 @@ public class BoardController {
     }
 
     @GetMapping("/board/{id}/updateForm")
-    public String updateForm(@PathVariable int id) {
+    public String updateForm(@PathVariable int id, Model model) {
+        model.addAttribute("dto", boardRepository.findByIdWithUser(id));
 
         return "board/updateForm";
     }
