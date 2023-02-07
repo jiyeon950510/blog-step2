@@ -91,4 +91,21 @@ public class BoardControllerTest {
         // then
         resultActions.andExpect(status().is3xxRedirection());
     }
+
+    @Test
+    public void datail_test() throws Exception {
+        // given
+        int id = 1;
+        // when
+        ResultActions resultActions = mvc.perform(
+                get("/board/" + id));
+        Map<String, Object> map = resultActions.andReturn().getModelAndView().getModel();
+        BoardResp.BoardDetailResDto dto = (BoardResp.BoardDetailResDto) map.get("dto");
+        String model = om.writeValueAsString(dto);
+        System.out.println("테스트 : " + model);
+
+        // then
+        resultActions.andExpect(status().isOk());
+        // assertThat(dto.getUsername()).isEqualTo("love");
+    }
 }
