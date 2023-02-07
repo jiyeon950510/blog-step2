@@ -14,4 +14,15 @@ public class BoardResp {// 응답의 dto
 
     }
 
+    @Setter
+    @Getter
+    public static class BoardDetailResDto {
+        private int id;
+        private String title;
+        private String content;
+        private int userId;
+        private String username;
+
+    }
+
 }
