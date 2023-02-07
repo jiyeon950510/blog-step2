@@ -51,10 +51,9 @@ public class BoardControllerTest {
         // given
         setUp();
         String title = "";
-        for (int i = 0; i < 200; i++) {
+        for (int i = 0; i < 90; i++) {
             title += "가";
         }
-
         String requestBody = "title=" + title + "&content=내용1";
 
         // when

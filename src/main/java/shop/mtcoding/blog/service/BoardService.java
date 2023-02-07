@@ -17,11 +17,11 @@ public class BoardService {
 
     // where 절에 걸리는 파다메터를 앞에 받기 (약속)
     @Transactional
-    public int 글쓰기(BoardSaveReqDto boardSaveReqDto, int userId) {
-        int result = boardRepository.insert(boardSaveReqDto.getTitle(),boardSaveReqDto.getContent(),userId);
+    public void 글쓰기(BoardSaveReqDto boardSaveReqDto, int userId) {
+        int result = boardRepository.insert(boardSaveReqDto.getTitle(), boardSaveReqDto.getContent(), userId);
         if (result != 1) {
             throw new CustomException("글쓰기 실패", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return 1;
+        // return 1;
     }
 }

@@ -27,10 +27,11 @@ public class UserService {
     }
 
     public User 로그인(LoginReqDto loginReqDto) { // 한번 봤던 데이터를 계속 보기 위해서 Transactional 걸어주는 경우가 많음
-        User principal = userRepository.findByUsernameAndPassword(loginReqDto.getUsername(), loginReqDto.getPassword());
+        User principal = userRepository.findByUsernameAndPassword(
+                loginReqDto.getUsername(), loginReqDto.getPassword());
         if (principal == null) {
             throw new CustomException("유저네임 혹은 패스워드가 잘못 입력되었습니다.");
         }
-        return null;
+        return principal;
     };
 }
