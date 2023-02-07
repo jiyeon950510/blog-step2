@@ -21,6 +21,7 @@
                         alert(res.msg);
                         location.href="/";
                     }).fail((err)=>{ // 40X, 50X 일때
+                    
                         alert(err.responseJSON.msg);
                     });
                 }
