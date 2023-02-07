@@ -4,12 +4,27 @@
 
         <div class="container my-3">
 
-            <c:if test="${dto.userId == principal.id}" >
+            <%-- <c:if test="${dto.userId == principal.id}" > --%>
                 <div class="mb-3">
                     <a href="/board/1/updateForm" class="btn btn-warning">수정</a>
-                    <button id="btn-delete" class="btn btn-danger">삭제</button>
+                    <button onClick="deleteById(${dto.id})" class="btn btn-danger">삭제</button>
                 </div>
-            </c:if>
+            <%-- </c:if> --%>
+
+           <script>
+                function deleteById(id){
+                    $.ajax({
+                        type:"delete",
+                        url:"/board/"+id,
+                        dataType:"json"
+                    }).done((res)=>{ // 20X 일때
+                        alert(res.msg);
+                        location.href="/";
+                    }).fail((err)=>{ // 40X, 50X 일때
+                        alert(err.responseJSON.msg);
+                    });
+                }
+            </script>
 
 
         
