@@ -22,13 +22,15 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.mtcoding.blog.dto.board.BoardResp;
-
+import shop.mtcoding.blog.dto.board.BoardReq.BoardupdateReqDto;
 import shop.mtcoding.blog.model.User;
 
+@Transactional // 메서드 실행 직후에 롤백(서비스는 디폴트가 커밋) // auto_increment 조기화
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = WebEnvironment.MOCK)
 
@@ -134,22 +136,24 @@ public class BoardControllerTest {
     @Test
     public void update_test() throws Exception {
         // given
-        setUp();
-        String title = "";
-        for (int i = 0; i < 90; i++) {
-            title += "가";
-        }
-        String requestBody = "title=제목&content=내용&userId=1";
         int id = 1;
+        BoardupdateReqDto boardupdateReqDto = new BoardupdateReqDto();
+        boardupdateReqDto.setTitle("제목 수정");
+        boardupdateReqDto.setContent("내용 수정");
+
+        String requestBody = om.writeValueAsString(boardupdateReqDto);
+        System.out.println("테스트 :" + requestBody);
 
         // when
         ResultActions resultActions = mvc.perform(
-                post("/board/" + id + "/update")
+                post("/board/" + id)
                         .content(requestBody)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .session(mockSession));
 
         // then
-        resultActions.andExpect(status().is3xxRedirection());
+        resultActions.andExpect(status().isOk());
+        resultActions.andExpect(jsonPath("$.code").value(1));
+
     }
 }

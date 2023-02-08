@@ -15,9 +15,9 @@ public class BoardReq {
     @Setter
     @Getter
     public static class BoardupdateReqDto {
-        private int id;
+        // private int id;
         private String title;
         private String content;
-        private int userId;
+        // private int userId;
     }
 }

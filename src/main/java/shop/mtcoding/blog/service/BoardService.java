@@ -1,6 +1,10 @@
 package shop.mtcoding.blog.service;
 
+import java.security.Principal;
 import java.util.List;
+
+import javax.servlet.http.HttpSession;
+import javax.websocket.Session;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +27,8 @@ public class BoardService {
 
     @Autowired
     private BoardRepository boardRepository;
+    @Autowired
+    private HttpSession session;
 
     // where 절에 걸리는 파다메터를 앞에 받기 (약속)
     @Transactional
@@ -53,19 +59,19 @@ public class BoardService {
     }
 
     @Transactional
-    public void 글수정(BoardupdateReqDto boardupdateReqDto, User principal) {
-        Board boardUb = boardRepository.findById(principal.getId());
+    public void 글수정(int id, BoardupdateReqDto boardupdateReqDto, int principalId) {
+        Board boardUb = boardRepository.findById(id);
         if (boardUb == null) {
-            throw new CustomException("없는 게시글을 수정할 수 없습니다");
+            throw new CustomApiException("없는 게시글을 찾을 수 없습니다");
         }
-        if (boardUb.getUserId() != boardupdateReqDto.getUserId()) {
-            throw new CustomException("해당 게시글을 수정할 권한이 없습니다", HttpStatus.FORBIDDEN);
+        if (boardUb.getUserId() != principalId) {
+            throw new CustomApiException("해당 게시글을 수정할 권한이 없습니다", HttpStatus.FORBIDDEN);
         }
+        // 부가로직은 추후 aop 쓸꺼ㄱㅇㄷ
 
-        int result = boardRepository.updateById(boardupdateReqDto.getId(), boardupdateReqDto.getTitle(),
-                boardupdateReqDto.getContent());
+        int result = boardRepository.updateById(id, boardupdateReqDto.getTitle(), boardupdateReqDto.getContent());
         if (result != 1) {
-            throw new CustomException("글수정 실패", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomApiException("게시글 수정에 실패하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
         // return 1;
     }
