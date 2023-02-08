@@ -10,6 +10,7 @@ public class BoardReq {
     public static class BoardSaveReqDto {
         private String title;
         private String content;
+        private String thumbnail;
     }
 
     @Setter

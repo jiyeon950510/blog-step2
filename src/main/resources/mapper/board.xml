@@ -14,7 +14,7 @@
     </select>    
 
     <insert id="insert">
-        insert into board_tb (title, content, user_id, created_at) values(#{title}, #{content}, #{userId}, now())
+        insert into board_tb (title, content, thumbnail, user_id, created_at) values(#{title}, #{content}, #{thumbnail}, #{userId}, now())
     </insert>    
 
     <delete id="deleteById" >
@@ -22,11 +22,11 @@
     </delete>    
 
     <update id="updateById" >
-        update board_tb set title= #{title},content= #{content} where id = #{id} 
+        update board_tb set title= #{title},content= #{content},thumbnail=#{thumbnail} where id = #{id} 
     </update>    
 
     <select id="findAllWithUser" resultType="shop.mtcoding.blog.dto.board.BoardResp$BoardMainResDto">
-        select bt.id, bt.title, ut.username 
+        select bt.id, bt.title,bt.thumbnail, ut.username 
         from board_tb bt 
         inner join user_tb ut 
         on bt.user_id = ut.id

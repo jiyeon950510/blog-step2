@@ -10,6 +10,7 @@ public class BoardResp {// 응답의 dto
     public static class BoardMainResDto {
         private int id;
         private String title;
+        private String thumbnail;
         private String username;
 
     }
