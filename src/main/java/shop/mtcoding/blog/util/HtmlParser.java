@@ -9,22 +9,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import shop.mtcoding.blog.dto.board.BoardReq.BoardSaveReqDto;
 import shop.mtcoding.blog.model.BoardRepository;
 
-public class Thumbnail {
+public class HtmlParser {
 
-    @Autowired
-    private BoardRepository boardRepository;
-
-    public void ThumbnailUtil(BoardSaveReqDto boardSaveReqDto) {
-        // String img = "";
-
-        Document doc = Jsoup.parse(boardSaveReqDto.getContent());
+    public static String getThumbnail(String html) {
+        String thumnail;
+        Document doc = Jsoup.parse(html);
         Elements els = doc.select("img"); // 복수, 배열로 리턴
         if (els.size() == 0) {
             // 디비 thumnail -> /images/profile.ifif/
-            String temp = "/images/dm.png";
+            thumnail = "/images/dm.png";
         }
         Element el = els.get(0);
-
-        String img = el.attr("src");
+        thumnail = el.attr("src");
+        return thumnail;
     }
 }

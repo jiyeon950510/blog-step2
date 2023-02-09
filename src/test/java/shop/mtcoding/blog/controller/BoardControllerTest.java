@@ -96,22 +96,16 @@ public class BoardControllerTest {
     }
 
     @Test
-    public void save_test() throws Exception {
+    public void save_test() throws Exception { // 글 쓰기
         // given
-        setUp();
-        String title = "";
-        for (int i = 0; i < 90; i++) {
-            title += "가";
-        }
-        String requestBody = "title=제목&content=내용&userId=1";
+        String requestBody = "title=제목1&content=내용1";
 
         // when
         ResultActions resultActions = mvc.perform(
-                post("/board")
+                post("/board/Write")
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                         .session(mockSession));
-
         // then
         resultActions.andExpect(status().is3xxRedirection());
     }

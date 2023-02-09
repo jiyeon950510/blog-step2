@@ -22,5 +22,6 @@ public class CustomExceptionHanlder {
     @ExceptionHandler(CustomApiException.class)
     public ResponseEntity<?> customApiException(CustomApiException e) {
         return new ResponseEntity<>(new ResponseDto<>(-1, e.getMessage(), null), e.getStatus());
+        // ResponseDto<> 상태 코드를 동시에 받음
     }
 }

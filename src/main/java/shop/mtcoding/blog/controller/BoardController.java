@@ -26,7 +26,7 @@ import shop.mtcoding.blog.model.BoardRepository;
 import shop.mtcoding.blog.model.User;
 import shop.mtcoding.blog.service.BoardService;
 
-@Controller
+@Controller // 뷰리졸버 발동
 public class BoardController {
 
     @Autowired
@@ -94,20 +94,25 @@ public class BoardController {
         return new ResponseEntity<>(new ResponseDto<>(1, "삭제성공", null), HttpStatus.OK);
     }
 
-    @PostMapping("/board")
-    public String save(BoardSaveReqDto BoardSaveReqDto) {
+    @PostMapping("/board") // @ResponseBody 뷰리졸버 x , 버퍼드 라이트 발동
+    public @ResponseBody ResponseEntity<?> save(@RequestBody BoardSaveReqDto BoardSaveReqDto) {
+
         User principal = (User) session.getAttribute("principal");
         if (principal == null) {
-            throw new CustomException("인증이 되지 않았습니다", HttpStatus.UNAUTHORIZED);
+            throw new CustomApiException("인증이 되지 않았습니다", HttpStatus.UNAUTHORIZED);
         }
         if (BoardSaveReqDto.getTitle() == null || BoardSaveReqDto.getTitle().isEmpty()) {
-            throw new CustomException("title을 작성해주세요");
+            throw new CustomApiException("title을 작성해주세요");
         }
         if (BoardSaveReqDto.getContent() == null || BoardSaveReqDto.getContent().isEmpty()) {
-            throw new CustomException("content를 작성해주세요");
+            throw new CustomApiException("content를 작성해주세요");
+        }
+        if (BoardSaveReqDto.getTitle().length() > 100) {
+            throw new CustomApiException("title의 길이가 100자 이하여야 합니다");
         }
         boardService.글쓰기(BoardSaveReqDto, principal.getId());
-        return "redirect:/";
+        return new ResponseEntity<>(new ResponseDto<>(1, "글쓰기 성공", null), HttpStatus.CREATED);
+
     }
 
     @GetMapping({ "/", "/board" })
