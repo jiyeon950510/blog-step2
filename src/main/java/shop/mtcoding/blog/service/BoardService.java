@@ -73,21 +73,14 @@ public class BoardService {
             throw new CustomApiException("해당 게시글을 수정할 권한이 없습니다", HttpStatus.FORBIDDEN);
         }
         // 부가로직은 추후 aop 쓸꺼ㄱㅇㄷ
-        Document doc = Jsoup.parse(boardupdateReqDto.getContent());
-        Elements els = doc.select("img"); // 복수, 배열로 리턴
-        if (els.size() == 0) {
-            // 디비 thumnail -> /images/profile.ifif/
-            String temp = "/images/dm.png";
-        }
-        Element el = els.get(0);
+        BoardSaveReqDto boardSaveReqDto = new BoardSaveReqDto();
+        String thumnail = HtmlParser.getThumbnail(boardSaveReqDto.getContent());
 
-        String img = el.attr("src");
-
-        int result = boardRepository.updateById(id, boardupdateReqDto.getTitle(), boardupdateReqDto.getContent(), img);
+        int result = boardRepository.updateById(id, boardupdateReqDto.getTitle(), boardupdateReqDto.getContent(),
+                thumnail);
         if (result != 1) {
             throw new CustomApiException("게시글 수정에 실패하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
         // return 1;
     }
-
 }

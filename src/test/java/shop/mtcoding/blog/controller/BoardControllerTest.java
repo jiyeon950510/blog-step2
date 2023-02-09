@@ -26,8 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.mtcoding.blog.dto.board.BoardResp;
+import shop.mtcoding.blog.dto.board.BoardReq.BoardSaveReqDto;
 import shop.mtcoding.blog.dto.board.BoardReq.BoardupdateReqDto;
+import shop.mtcoding.blog.dto.board.BoardResp;
 import shop.mtcoding.blog.model.User;
 
 @Transactional // 메서드 실행 직후에 롤백(서비스는 디폴트가 커밋) // auto_increment 조기화
@@ -96,18 +97,23 @@ public class BoardControllerTest {
     }
 
     @Test
-    public void save_test() throws Exception { // 글 쓰기
+    public void save_test() throws Exception {
         // given
-        String requestBody = "title=제목1&content=내용1";
+        BoardSaveReqDto boardSaveReqDto = new BoardSaveReqDto();
+        boardSaveReqDto.setTitle("제목");
+        boardSaveReqDto.setContent("내용");
 
+        String requestBody = om.writeValueAsString(boardSaveReqDto);
         // when
         ResultActions resultActions = mvc.perform(
-                post("/board/Write")
+                post("/board")
                         .content(requestBody)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .session(mockSession));
+
+        System.out.println("save_test : ");
         // then
-        resultActions.andExpect(status().is3xxRedirection());
+        resultActions.andExpect(status().isCreated());
     }
 
     @Test
