@@ -18,20 +18,12 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
     @Autowired
     private HttpSession session;
 
-    @GetMapping("/logout")
-    public String logout() {
-        session.invalidate();
-        return "redirect:/";
-    }
-
     @PostMapping("/join")
     public String join(JoinReqDto joinReqDto) {
-        // System.out.println(joinReqDto.getUsername());
-        // System.out.println(joinReqDto.getPassword());
-        // System.out.println(joinReqDto.getEmail());
 
         if (joinReqDto.getUsername() == null || joinReqDto.getUsername().isEmpty()) {
             throw new CustomException("username을 작성해주세요");
@@ -76,4 +68,9 @@ public class UserController {
         return "user/updateForm";
     }
 
+    @GetMapping("/logout")
+    public String logout() {
+        session.invalidate();
+        return "redirect:/";
+    }
 }

@@ -4,23 +4,20 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import shop.mtcoding.blog.dto.board.BoardReq.BoardSaveReqDto;
-import shop.mtcoding.blog.model.BoardRepository;
 
 public class HtmlParser {
 
     public static String getThumbnail(String html) {
-        String thumnail;
+        String thumbnail;
         Document doc = Jsoup.parse(html);
-        Elements els = doc.select("img"); // 복수, 배열로 리턴
+        Elements els = doc.select("img");
+
         if (els.size() == 0) {
-            // 디비 thumnail -> /images/profile.ifif/
-            thumnail = "/images/dm.png";
+            thumbnail = "/images/dm.png";
+        } else {
+            Element el = els.get(0);
+            thumbnail = el.attr("src");
         }
-        Element el = els.get(0);
-        thumnail = el.attr("src");
-        return thumnail;
+        return thumbnail;
     }
 }

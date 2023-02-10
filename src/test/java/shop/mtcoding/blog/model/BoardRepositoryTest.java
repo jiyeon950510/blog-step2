@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.mtcoding.blog.dto.board.BoardResp.BoardMainResDto;
+import shop.mtcoding.blog.dto.board.BoardResp.BoardMainRespDto;
 
 // F - DS - C - S - R - MyBatis - DB
 @MybatisTest
@@ -22,15 +22,14 @@ public class BoardRepositoryTest {
     @Test
     public void findAllWithUser_test() throws Exception {
         // given
-        ObjectMapper om = new ObjectMapper(); // jackson (json을 자바 object로 변경)
-        // when
-        List<BoardMainResDto> boardMainResDto = boardRepository.findAllWithUser();
-        System.out.println("테스트 : size : " + boardMainResDto.size());
+        ObjectMapper om = new ObjectMapper(); // Jackson
 
-        String responseBody = om.writeValueAsString(boardMainResDto);
+        // when
+        List<BoardMainRespDto> BoardMainRespDto = boardRepository.findAllWithUser();
+        String responseBody = om.writeValueAsString(BoardMainRespDto);
         System.out.println("테스트 : " + responseBody);
 
         // then
-        assertThat(boardMainResDto.get(5).getUsername()).isEqualTo("love");
+        assertThat(BoardMainRespDto.get(5).getUsername()).isEqualTo("love");
     }
 }

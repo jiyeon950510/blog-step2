@@ -1,17 +1,6 @@
 package shop.mtcoding.blog.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,29 +12,38 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import shop.mtcoding.blog.dto.board.BoardReq.BoardSaveReqDto;
-import shop.mtcoding.blog.dto.board.BoardReq.BoardupdateReqDto;
+import shop.mtcoding.blog.dto.board.BoardReq.BoardUpdateReqDto;
 import shop.mtcoding.blog.dto.board.BoardResp;
+import shop.mtcoding.blog.dto.board.BoardResp.BoardDetailRespDto;
 import shop.mtcoding.blog.model.User;
 
-@Transactional // 메서드 실행 직후에 롤백(서비스는 디폴트가 커밋) // auto_increment 조기화
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@Transactional // 메서드 실행 직후 롤백!! // auto_increment 초기화
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = WebEnvironment.MOCK)
-
 public class BoardControllerTest {
 
     @Autowired
     private MockMvc mvc;
+
     @Autowired
     private ObjectMapper om;
 
     private MockHttpSession mockSession;
 
-    @BeforeEach // test 메서드 실행 직전 마다 호출됨
+    @BeforeEach
     public void setUp() {
+        // 세션 주입
         User user = new User();
         user.setId(1);
         user.setUsername("ssar");
@@ -58,23 +56,68 @@ public class BoardControllerTest {
     }
 
     @Test
+    public void update_test() throws Exception {
+        // given
+        int id = 1;
+        BoardUpdateReqDto boardUpdateReqDto = new BoardUpdateReqDto();
+        boardUpdateReqDto.setTitle("제목1-수정");
+        boardUpdateReqDto.setContent("내용1-수정");
+
+        String requestBody = om.writeValueAsString(boardUpdateReqDto);
+        System.out.println("테스트 : " + requestBody);
+
+        // when
+        ResultActions resultActions = mvc.perform(
+                put("/board/" + id)
+                        .content(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .session(mockSession));
+
+        // then
+        resultActions.andExpect(status().isOk());
+        resultActions.andExpect(jsonPath("$.code").value(1));
+    }
+
+    @Test
     public void delete_test() throws Exception {
         // given
         int id = 1;
+
         // when
-        ResultActions resultActions = mvc.perform(delete("/board/" + id).session(mockSession));
+        ResultActions resultActions = mvc.perform(
+                delete("/board/" + id).session(mockSession));
         String responseBody = resultActions.andReturn().getResponse().getContentAsString();
-        System.out.println("테스트 : " + responseBody);
-        /*
+        System.out.println("delete_test : " + responseBody);
+
+        /**
          * jsonPath
          * 최상위 : $
-         * 객체상태 : 닷(.)
+         * 객체탐색 : 닷(.)
          * 배열 : [0]
          */
         // then
         resultActions.andExpect(jsonPath("$.code").value(1));
         resultActions.andExpect(status().isOk());
+    }
 
+    @Test
+    public void detail_test() throws Exception {
+        // given
+        int id = 1;
+
+        // when
+        ResultActions resultActions = mvc.perform(
+                get("/board/" + id));
+        Map<String, Object> map = resultActions.andReturn().getModelAndView().getModel();
+        BoardDetailRespDto dto = (BoardDetailRespDto) map.get("dto");
+        String model = om.writeValueAsString(dto);
+        System.out.println("detail_test : " + model);
+
+        // then
+        resultActions.andExpect(status().isOk());
+        assertThat(dto.getUsername()).isEqualTo("ssar");
+        assertThat(dto.getUserId()).isEqualTo(1);
+        assertThat(dto.getTitle()).isEqualTo("1번째 제목");
     }
 
     @Test
@@ -85,9 +128,9 @@ public class BoardControllerTest {
         ResultActions resultActions = mvc.perform(
                 get("/"));
         Map<String, Object> map = resultActions.andReturn().getModelAndView().getModel();
-        List<BoardResp.BoardMainResDto> dtos = (List<BoardResp.BoardMainResDto>) map.get("dtos");
+        List<BoardResp.BoardMainRespDto> dtos = (List<BoardResp.BoardMainRespDto>) map.get("dtos");
         String model = om.writeValueAsString(dtos);
-        System.out.println("테스트 : " + model);
+        System.out.println("main_test : " + model);
 
         // then
         resultActions.andExpect(status().isOk());
@@ -114,46 +157,5 @@ public class BoardControllerTest {
         System.out.println("save_test : ");
         // then
         resultActions.andExpect(status().isCreated());
-    }
-
-    @Test
-    public void datail_test() throws Exception {
-        // given
-        int id = 1;
-        // when
-        ResultActions resultActions = mvc.perform(
-                get("/board/" + id));
-        Map<String, Object> map = resultActions.andReturn().getModelAndView().getModel();
-        BoardResp.BoardDetailResDto dto = (BoardResp.BoardDetailResDto) map.get("dto");
-        String model = om.writeValueAsString(dto);
-        System.out.println("테스트 : " + model);
-
-        // then
-        resultActions.andExpect(status().isOk());
-        // assertThat(dto.getUsername()).isEqualTo("love");
-    }
-
-    @Test
-    public void update_test() throws Exception {
-        // given
-        int id = 1;
-        BoardupdateReqDto boardupdateReqDto = new BoardupdateReqDto();
-        boardupdateReqDto.setTitle("제목 수정");
-        boardupdateReqDto.setContent("내용 수정");
-
-        String requestBody = om.writeValueAsString(boardupdateReqDto);
-        System.out.println("테스트 :" + requestBody);
-
-        // when
-        ResultActions resultActions = mvc.perform(
-                post("/board/" + id)
-                        .content(requestBody)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .session(mockSession));
-
-        // then
-        resultActions.andExpect(status().isOk());
-        resultActions.andExpect(jsonPath("$.code").value(1));
-
     }
 }

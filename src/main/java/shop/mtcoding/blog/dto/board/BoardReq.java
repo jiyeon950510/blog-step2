@@ -15,7 +15,7 @@ public class BoardReq {
 
     @Setter
     @Getter
-    public static class BoardupdateReqDto {
+    public static class BoardUpdateReqDto {
         private String title;
         private String content;
     }
