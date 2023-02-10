@@ -44,6 +44,12 @@ public class BoardController {
      * 클라이언트로부터 데이터가 날라올때, 바디가 제이슨인 경우 리퀘스트 바디를 붙여서 파싱
      */
 
+    // @PostMapping("/juso")
+    // public @ResponseBody String callback(String roadFullAddr) {
+    // System.out.println("도로명 주소: " + roadFullAddr);
+    // return "ok";
+    // }
+
     @PutMapping("/board/{id}")
     public @ResponseBody ResponseEntity<?> update(@PathVariable int id, @RequestBody BoardupdateReqDto boardUpdateDto,
             HttpServletResponse response) {
